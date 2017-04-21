@@ -3,5 +3,7 @@
 
     <string name="app_name">Dictionary(E)</string>
     <string name="hello_world">Hello world!</string>
+    <string name="actv_hint">Input a word please</string>
+    <string name="search_button">search</string>
 
 </resources>
