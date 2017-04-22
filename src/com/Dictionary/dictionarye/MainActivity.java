@@ -9,6 +9,7 @@ import android.R.layout;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -35,7 +36,11 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
 	private Spinner word_type;
 	private AutoCompleteTextView actvWord;
 	private Button searchWord;
+	private Button btn_notebook;
+	private Button btn_mine;
+	private Button btn_home;
 	private TextView result_show;
+	private static TextView username_show;
 	private final String DATABASE_PATH = android.os.Environment
 			.getExternalStorageDirectory().getAbsolutePath()
 			+"/dictionary";
@@ -46,24 +51,38 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		database = openDatabase();
+		word_type = (Spinner) findViewById(R.id.spinner_language_type);
 		searchWord = (Button)findViewById(R.id.button_search);
 		actvWord = (AutoCompleteTextView)findViewById(R.id.actv_word);
+		result_show = (TextView)findViewById(R.id.result_show);
+		username_show = (TextView) findViewById(R.id.username_show);
+		btn_home = (Button) findViewById(R.id.btn_home);
+		btn_notebook = (Button) findViewById(R.id.btn_notebook);
+		btn_mine = (Button) findViewById(R.id.btn_mine);
+		username_show.setText(getIntent().getStringExtra("username_show"));
 		actvWord.addTextChangedListener(this);
 		searchWord.setOnClickListener(this);
+		btn_home.setOnClickListener(this);
+		btn_notebook.setOnClickListener(this);
+		btn_mine.setOnClickListener(this);
 	}
+/*	public static void setUsername_show(String username_show) {
+		MainActivity.username_show.setText(username_show);
+	}*/
 	@Override
 	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 		// TODO Auto-generated method stub
-		result_show.setText("");
+		//result_show.setText("");
 	}
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
 		// TODO Auto-generated method stub
-		result_show.setText("");
+		//result_show.setText("");
 	}
 	@Override
 	public void afterTextChanged(Editable s) {
 		// TODO Auto-generated method stub
+		result_show.setText("");
 		Cursor cursor= database.rawQuery("select english as _id from t_words where english like ?",
 				new String[]{s.toString()+"%"});
 		DictionaryAdapter adapter = new DictionaryAdapter(this, cursor, true);
@@ -73,25 +92,47 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
 	}
 	@Override
 	public void onClick(View view){
-		String sqlString = "select chinese from t_words where english=?";
-		Cursor cursor = database.rawQuery(sqlString, new String[]{actvWord.getText().toString().trim()});
-		String result = "";
-		if(cursor.getCount()>0){
-			cursor.moveToFirst();
-			result = cursor.getString(cursor.getColumnIndex("chinese"));
+		switch (view.getId()) {
+		case R.id.button_search:
+			String sqlString = "select chinese from t_words where english=?";
+			Cursor cursor = database.rawQuery(sqlString, new String[]{actvWord.getText().toString().trim()});
+			String result = "";
+			if(cursor.getCount()>0){
+				cursor.moveToFirst();
+				result = cursor.getString(cursor.getColumnIndex("chinese"));
+			}
+			//new AlertDialog.Builder(this).setTitle("The result is").
+			//setMessage(result).setPositiveButton("close", null).show();
+			if("".equals(result)){
+				Toast toast = Toast.makeText(this,"Input a word please!",Toast.LENGTH_LONG);
+				LinearLayout linearLayout = (LinearLayout) toast.getView();  
+				TextView messageTextView = (TextView) linearLayout.getChildAt(0);  
+				messageTextView.setTextSize(30);  
+				toast.show();
+			}
+			result_show.setText(result);
+			break;
+		case R.id.btn_home:
+			String page = "com.Dictionary.dictionarye.MainActivity";
+			changePage(MainActivity.this, page);
+		case R.id.btn_notebook:
+			String page1 = "com.Dictionary.dictionarye.NotebookActivity";
+			changePage(MainActivity.this, page1);
+			break;
+		case R.id.btn_mine:
+			Intent intent = new Intent();
+			intent.putExtra("loginUser",username_show.getText().toString());
+			intent.setClass(MainActivity.this, LoginActivity.class);
+			startActivityForResult(intent, 0);
+			break;
 		}
-		//new AlertDialog.Builder(this).setTitle("The result is").
-		//setMessage(result).setPositiveButton("close", null).show();
-		if("".equals(result)){
-			Toast toast = Toast.makeText(this,"Input a word please!",Toast.LENGTH_LONG);
-			LinearLayout linearLayout = (LinearLayout) toast.getView();  
-			TextView messageTextView = (TextView) linearLayout.getChildAt(0);  
-			messageTextView.setTextSize(30);  
-			toast.show();
-		}
-		result_show=(TextView)findViewById(R.id.result_show);
-		result_show.setText(result);
 		
+		
+	}
+	private void changePage(Context context,String page){
+		Intent in = new Intent();  
+        in.setClassName( context, page);  
+        startActivity( in );
 	}
 	private SQLiteDatabase openDatabase() {
 		

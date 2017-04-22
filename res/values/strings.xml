@@ -2,8 +2,19 @@
 <resources>
 
     <string name="app_name">Dictionary(E)</string>
-    <string name="hello_world">Hello world!</string>
     <string name="actv_hint">Input a word please</string>
     <string name="search_button">search</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="username_hint">Input username please</string>
+    <string name="password_hint">Input password please</string>
+    <string name="btn_register">Register</string>
+    <string name="btn_login"> Login </string>
+    <string name="username_label_text">Username:</string>
+    <string name="password_label_text">Password:</string>
+    <string name="note_book">Notebook</string>
+    <string name="btn_mine">Mine   </string>
+    <string name="btn_home">Home</string>
+    <string name="title_activity_login_user">LoginUserActivity</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>
