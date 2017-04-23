@@ -16,5 +16,7 @@
     <string name="btn_home">Home</string>
     <string name="title_activity_login_user">LoginUserActivity</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_note_book">NoteBookActivity</string>
+    <string name="title_activity_practice">PracticeActivity</string>
 
 </resources>

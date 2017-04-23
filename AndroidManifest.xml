@@ -33,6 +33,14 @@
             android:name=".LoginUserActivity"
             android:label="@string/title_activity_login_user" >
         </activity>
+        <activity
+            android:name=".NoteBookActivity"
+            android:label="@string/title_activity_note_book" >
+        </activity>
+        <activity
+            android:name=".PracticeActivity"
+            android:label="@string/title_activity_practice" >
+        </activity>
     </application>
 
 </manifest>

@@ -113,10 +113,9 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
 			result_show.setText(result);
 			break;
 		case R.id.btn_home:
-			String page = "com.Dictionary.dictionarye.MainActivity";
-			changePage(MainActivity.this, page);
+			break;
 		case R.id.btn_notebook:
-			String page1 = "com.Dictionary.dictionarye.NotebookActivity";
+			String page1 = "com.Dictionary.dictionarye.NoteBookActivity";
 			changePage(MainActivity.this, page1);
 			break;
 		case R.id.btn_mine:
