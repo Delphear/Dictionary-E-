@@ -39,9 +39,12 @@ public class LoginUserActivity extends Activity implements OnClickListener{
 		}
 	}
 	private void changePage(Context context,String page){
-		Intent in = new Intent();  
-        in.setClassName( context, page);  
-        startActivity( in );
+		Intent intent = new Intent();  
+        intent.setClassName( context, page);  
+/*        startActivity( in );
+		Intent intent = new Intent();
+		intent.setClass(LoginActivity.this, LoginUserActivity.class);*/
+		startActivityForResult(intent, 0);
 	}
 	public void logout(){
 		//TODO

@@ -3,7 +3,9 @@ package com.Dictionary.dictionarye;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+
 
 import android.R.layout;
 import android.app.Activity;
@@ -17,6 +19,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,37 +35,40 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity implements OnClickListener, TextWatcher{
-
+	private static final String ACTIVITY_TAG="LogDemo";
 	private Spinner word_type;
 	private AutoCompleteTextView actvWord;
 	private Button searchWord;
 	private Button btn_notebook;
 	private Button btn_mine;
-	private Button btn_home;
 	private TextView result_show;
 	private static TextView username_show;
-	private final String DATABASE_PATH = android.os.Environment
-			.getExternalStorageDirectory().getAbsolutePath()
-			+"/dictionary";
-	private final String DATABASE_FILENAME = "dictionary.db";
-	private SQLiteDatabase database;
+	private static SQLiteDatabase worddatabase;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		database = openDatabase();
+		worddatabase=(new CreateDatabase()).createDatabase();
+		//database = new MySqliteOpenHelper(getApplicationContext()).getWritableDatabase();	
+		//Log.e(ACTIVITY_TAG,"isreadonly:"+database.isReadOnly());
+		//database.findEditTable(tables)
+		/*Cursor cursor = database.rawQuery("select * from user_info", null);
+		while(cursor.moveToNext() && cursor.getCount()>0){
+			Log.e(ACTIVITY_TAG,cursor.getString(0)+cursor.getString(1));
+		}*/
 		word_type = (Spinner) findViewById(R.id.spinner_language_type);
 		searchWord = (Button)findViewById(R.id.button_search);
 		actvWord = (AutoCompleteTextView)findViewById(R.id.actv_word);
 		result_show = (TextView)findViewById(R.id.result_show);
 		username_show = (TextView) findViewById(R.id.username_show);
-		btn_home = (Button) findViewById(R.id.btn_home);
 		btn_notebook = (Button) findViewById(R.id.btn_notebook);
 		btn_mine = (Button) findViewById(R.id.btn_mine);
-		username_show.setText(getIntent().getStringExtra("username_show"));
+		String getname=getIntent().getStringExtra("username_show");
+		if(!"".equals(getname)){
+			username_show.setText(getname);
+		}
 		actvWord.addTextChangedListener(this);
 		searchWord.setOnClickListener(this);
-		btn_home.setOnClickListener(this);
 		btn_notebook.setOnClickListener(this);
 		btn_mine.setOnClickListener(this);
 	}
@@ -83,7 +89,7 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
 	public void afterTextChanged(Editable s) {
 		// TODO Auto-generated method stub
 		result_show.setText("");
-		Cursor cursor= database.rawQuery("select english as _id from t_words where english like ?",
+		Cursor cursor= worddatabase.rawQuery("select english as _id from t_words where english like ?",
 				new String[]{s.toString()+"%"});
 		DictionaryAdapter adapter = new DictionaryAdapter(this, cursor, true);
 		actvWord.setAdapter(adapter);
@@ -95,7 +101,7 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
 		switch (view.getId()) {
 		case R.id.button_search:
 			String sqlString = "select chinese from t_words where english=?";
-			Cursor cursor = database.rawQuery(sqlString, new String[]{actvWord.getText().toString().trim()});
+			Cursor cursor = worddatabase.rawQuery(sqlString, new String[]{actvWord.getText().toString().trim()});
 			String result = "";
 			if(cursor.getCount()>0){
 				cursor.moveToFirst();
@@ -111,8 +117,6 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
 				toast.show();
 			}
 			result_show.setText(result);
-			break;
-		case R.id.btn_home:
 			break;
 		case R.id.btn_notebook:
 			String page1 = "com.Dictionary.dictionarye.NoteBookActivity";
@@ -133,32 +137,7 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
         in.setClassName( context, page);  
         startActivity( in );
 	}
-	private SQLiteDatabase openDatabase() {
-		
-			String databaseFilename = DATABASE_PATH + "/" + DATABASE_FILENAME;
-			File file = new File(DATABASE_PATH);
-			if(!file.exists()){file.mkdir();}
-			try {
-				if(!(new File(databaseFilename)).exists()){
-				InputStream iStream = getResources().openRawResource(R.raw.dictionary);
-				FileOutputStream fos = new FileOutputStream(databaseFilename);
-				byte[] buffer = new byte[8192];
-				int count = 0;
-				while((count=iStream.read(buffer))>0){fos.write(buffer, 0, count);}
-				fos.close();
-				iStream.close();
-			}
-			SQLiteDatabase database = SQLiteDatabase.openOrCreateDatabase(databaseFilename, null);
-			return database;
-		}catch (FileNotFoundException e) {
-			e.getStackTrace();
-			// TODO: handle exception
-		}catch (Exception e) {
-			// TODO: handle exception
-			e.getStackTrace();
-		}
-		return null;
-	}
+	
 	public class DictionaryAdapter extends CursorAdapter{
 		
 		private LayoutInflater layoutInflater;
@@ -190,4 +169,43 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
 		}
 		
 	}
+	public class CreateDatabase {
+		private final String DATABASE_PATH = android.os.Environment
+				.getExternalStorageDirectory().getAbsolutePath()
+				+"/dictionary";
+		private final String DATABASE_FILENAME = "dictionary.db";
+		String databaseFilename = DATABASE_PATH + "/" + DATABASE_FILENAME;
+
+			public  SQLiteDatabase createDatabase() {
+			File file = new File(DATABASE_PATH);
+			if(!file.exists()){file.mkdir();}
+			try {
+				if(!(new File(databaseFilename)).exists()){
+				InputStream iStream =MainActivity.this.getResources().openRawResource(R.raw.dictionary);
+				FileOutputStream fos = new FileOutputStream(databaseFilename);
+				byte[] buffer = new byte[8192];
+				int count = 0;
+				while((count=iStream.read(buffer))>0){fos.write(buffer, 0, count);}
+				fos.close();
+				iStream.close();
+			}
+				SQLiteDatabase db =SQLiteDatabase.openOrCreateDatabase(databaseFilename, null);
+				return db;
+			/*	String sql ="create table if not exists user_info(username varchar(20) primary key not null,password varchar(20) not null,Enotebook vachar(20) not null,Jnotebook vachar(20) not null)";
+				db.execSQL(sql);
+				db.execSQL("insert into user_info values(?,?,?,?)",new String[]{"##","##","##","##"});*/
+				} catch (NotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			return null;
+	}
+	}
+
 }
