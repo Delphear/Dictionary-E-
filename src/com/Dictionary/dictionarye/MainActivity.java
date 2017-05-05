@@ -10,6 +10,7 @@ import java.io.InputStream;
 import android.R.layout;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources.NotFoundException;
@@ -39,42 +40,33 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
 	private Spinner word_type;
 	private AutoCompleteTextView actvWord;
 	private Button searchWord;
+	private Button addnote;
+	private Button homepage;
+	private Button practice;
 	private Button btn_notebook;
-	private Button btn_mine;
 	private TextView result_show;
-	private static TextView username_show;
-	private static SQLiteDatabase worddatabase;
+	private int collected;
+	private static SQLiteDatabase database;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		worddatabase=(new CreateDatabase()).createDatabase();
-		//database = new MySqliteOpenHelper(getApplicationContext()).getWritableDatabase();	
-		//Log.e(ACTIVITY_TAG,"isreadonly:"+database.isReadOnly());
-		//database.findEditTable(tables)
-		/*Cursor cursor = database.rawQuery("select * from user_info", null);
-		while(cursor.moveToNext() && cursor.getCount()>0){
-			Log.e(ACTIVITY_TAG,cursor.getString(0)+cursor.getString(1));
-		}*/
+		database=(new CreateDatabase(this)).createDatabase();
 		word_type = (Spinner) findViewById(R.id.spinner_language_type);
 		searchWord = (Button)findViewById(R.id.button_search);
 		actvWord = (AutoCompleteTextView)findViewById(R.id.actv_word);
 		result_show = (TextView)findViewById(R.id.result_show);
-		username_show = (TextView) findViewById(R.id.username_show);
+		addnote = (Button) findViewById(R.id.addnote);
+		homepage = (Button) findViewById(R.id.homepage);
 		btn_notebook = (Button) findViewById(R.id.btn_notebook);
-		btn_mine = (Button) findViewById(R.id.btn_mine);
-		String getname=getIntent().getStringExtra("username_show");
-		if(!"".equals(getname)){
-			username_show.setText(getname);
-		}
+		practice = (Button) findViewById(R.id.practice);
 		actvWord.addTextChangedListener(this);
 		searchWord.setOnClickListener(this);
+		addnote.setOnClickListener(this);
+		homepage.setOnClickListener(this);
 		btn_notebook.setOnClickListener(this);
-		btn_mine.setOnClickListener(this);
+		practice.setOnClickListener(this);
 	}
-/*	public static void setUsername_show(String username_show) {
-		MainActivity.username_show.setText(username_show);
-	}*/
 	@Override
 	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 		// TODO Auto-generated method stub
@@ -89,10 +81,13 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
 	public void afterTextChanged(Editable s) {
 		// TODO Auto-generated method stub
 		result_show.setText("");
-		Cursor cursor= worddatabase.rawQuery("select english as _id from t_words where english like ?",
+		Cursor cursor= database.rawQuery("select english as _id from t_words where english like ?",
 				new String[]{s.toString()+"%"});
 		DictionaryAdapter adapter = new DictionaryAdapter(this, cursor, true);
 		actvWord.setAdapter(adapter);
+		addnote.setBackgroundResource(R.drawable.add_note);
+		addnote.setVisibility(View.INVISIBLE);
+		homepage.setBackgroundResource(R.drawable.dict_normal);
 		
 		
 	}
@@ -100,44 +95,86 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
 	public void onClick(View view){
 		switch (view.getId()) {
 		case R.id.button_search:
-			String sqlString = "select chinese from t_words where english=?";
-			Cursor cursor = worddatabase.rawQuery(sqlString, new String[]{actvWord.getText().toString().trim()});
-			String result = "";
-			if(cursor.getCount()>0){
-				cursor.moveToFirst();
-				result = cursor.getString(cursor.getColumnIndex("chinese"));
-			}
-			//new AlertDialog.Builder(this).setTitle("The result is").
-			//setMessage(result).setPositiveButton("close", null).show();
-			if("".equals(result)){
+			if(actvWord.getText().toString().equals("")){
 				Toast toast = Toast.makeText(this,"Input a word please!",Toast.LENGTH_LONG);
 				LinearLayout linearLayout = (LinearLayout) toast.getView();  
 				TextView messageTextView = (TextView) linearLayout.getChildAt(0);  
 				messageTextView.setTextSize(30);  
 				toast.show();
+			}else{
+				String sqlString = "select * from t_words where english=?";
+				Cursor cursor = database.rawQuery(sqlString, new String[]{actvWord.getText().toString().trim()});
+				String result = "";
+				if(cursor.getCount()>0){
+					cursor.moveToFirst();
+					result = cursor.getString(cursor.getColumnIndex("chinese"));
+					collected = cursor.getInt(cursor.getColumnIndex("collected"));
+
+					if(collected==1){
+						addnote.setBackgroundResource(R.drawable.add_note_disable);
+					}
+					result_show.setText(result);
+					homepage.setBackgroundResource(R.drawable.dict_selected);
+					addnote.setVisibility(view.VISIBLE);
+				}else if("".equals(result)){
+					changePage(MainActivity.this, "com.Dictionary.dictionarye.NotFoundActivity");
+				}
 			}
-			result_show.setText(result);
+			
+			break;
+		case R.id.addnote:
+			String sqlString1 = "select collected from t_words where english=?";
+			Cursor cursor1 = database.rawQuery(sqlString1, new String[]{actvWord.getText().toString().trim()});
+			if(cursor1.getCount()>0){
+				cursor1.moveToFirst();
+				collected = cursor1.getInt(cursor1.getColumnIndex("collected"));
+			}
+			ContentValues values = new ContentValues();
+			try {
+				if(collected==1){
+					values.put("collected",0);
+					database.update("t_words", values, "english=?", new String[]{actvWord.getText().toString().trim()});
+					addnote.setBackgroundResource(R.drawable.add_note);
+				}else{
+					values.put("collected",1);
+					database.update("t_words", values, "english=?", new String[]{actvWord.getText().toString().trim()});
+					addnote.setBackgroundResource(R.drawable.add_note_disable);	
+				}
+				Log.v(MainActivity.ACTIVITY_TAG, ""+collected);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			break;
+		case R.id.homepage:
+			String page = "com.Dictionary.dictionarye.MainActivity";
+			changePage(MainActivity.this, page);
 			break;
 		case R.id.btn_notebook:
 			String page1 = "com.Dictionary.dictionarye.NoteBookActivity";
 			changePage(MainActivity.this, page1);
 			break;
-		case R.id.btn_mine:
-			Intent intent = new Intent();
-			intent.putExtra("loginUser",username_show.getText().toString());
-			intent.setClass(MainActivity.this, LoginActivity.class);
-			startActivityForResult(intent, 0);
+		case R.id.practice:
+			String page2 = "com.Dictionary.dictionarye.PracticeActivity";
+			changePage(MainActivity.this, page2);
 			break;
 		}
 		
 		
 	}
 	private void changePage(Context context,String page){
-		Intent in = new Intent();  
+		Intent in = new Intent(); 
         in.setClassName( context, page);  
-        startActivity( in );
+        startActivity(in);
 	}
 	
+	public static SQLiteDatabase getDatabase() {
+		return database;
+	}
+	public static void setDatabase(SQLiteDatabase database) {
+		MainActivity.database = database;
+	}
+
 	public class DictionaryAdapter extends CursorAdapter{
 		
 		private LayoutInflater layoutInflater;
@@ -167,45 +204,5 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
 			// TODO Auto-generated method stub
 			setView(view, cursor);
 		}
-		
-	}
-	public class CreateDatabase {
-		private final String DATABASE_PATH = android.os.Environment
-				.getExternalStorageDirectory().getAbsolutePath()
-				+"/dictionary";
-		private final String DATABASE_FILENAME = "dictionary.db";
-		String databaseFilename = DATABASE_PATH + "/" + DATABASE_FILENAME;
-
-			public  SQLiteDatabase createDatabase() {
-			File file = new File(DATABASE_PATH);
-			if(!file.exists()){file.mkdir();}
-			try {
-				if(!(new File(databaseFilename)).exists()){
-				InputStream iStream =MainActivity.this.getResources().openRawResource(R.raw.dictionary);
-				FileOutputStream fos = new FileOutputStream(databaseFilename);
-				byte[] buffer = new byte[8192];
-				int count = 0;
-				while((count=iStream.read(buffer))>0){fos.write(buffer, 0, count);}
-				fos.close();
-				iStream.close();
-			}
-				SQLiteDatabase db =SQLiteDatabase.openOrCreateDatabase(databaseFilename, null);
-				return db;
-			/*	String sql ="create table if not exists user_info(username varchar(20) primary key not null,password varchar(20) not null,Enotebook vachar(20) not null,Jnotebook vachar(20) not null)";
-				db.execSQL(sql);
-				db.execSQL("insert into user_info values(?,?,?,?)",new String[]{"##","##","##","##"});*/
-				} catch (NotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			return null;
-	}
-	}
-
+	}	
 }

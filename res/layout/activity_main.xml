@@ -2,77 +2,89 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@drawable/bg"
+    android:orientation="vertical" >
+
+    <Spinner
+        android:id="@+id/spinner_language_type"
+        android:layout_width="match_parent"
+        android:layout_height="32dp" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="71dp" >
 
-        <TextView
-            android:id="@+id/username_show"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="43dp"
-            android:text=""
-            android:textSize="20sp" />
-
-        <Spinner
-            android:id="@+id/spinner_language_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/username_show" >
-            
-        </Spinner>
-
         <AutoCompleteTextView
             android:id="@+id/actv_word"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/spinner_language_type"
-            android:layout_below="@+id/username_show"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/button_search"
+            android:background="@drawable/rounded_edittext_states"
+            android:drawableStart="@drawable/btn_search"
             android:ems="10"
-            android:hint="@string/actv_hint" >
+            android:hint="@string/actv_hint"
+            android:lines="1"
+            android:singleLine="true" >
 
             <requestFocus />
         </AutoCompleteTextView>
 
+        <Button
+            android:id="@+id/button_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/actv_word"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/btn_search" />
+
     </RelativeLayout>
-<Button
-    android:id="@+id/button_search"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="@string/search_button"
-   />
-
-<TextView
-    android:id="@+id/result_show"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textSize="21sp"
-    android:textColor="#ff0022"
-    android:text="" />
-
-<RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
-    <Button
-        android:id="@+id/btn_mine"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:text="@string/btn_mine" />
 
     <Button
-        android:id="@+id/btn_notebook"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="16dp"
-        android:text="@string/note_book" />
+        android:id="@+id/addnote"
+        android:layout_width="50dip"
+        android:layout_height="50dip"
+        android:background="@drawable/add_note"
+        android:visibility="invisible" />
 
-</RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/result_show"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#ff0022"
+            android:textSize="30sp" />
+
+        <Button
+            android:id="@+id/practice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/notes_selected" />
+
+        <Button
+            android:id="@+id/btn_notebook"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/notebook"/>
+
+        <Button
+            android:id="@+id/homepage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/dict_normal"
+            />
+
+    </RelativeLayout>
 
 </LinearLayout>
