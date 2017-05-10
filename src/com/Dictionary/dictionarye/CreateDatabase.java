@@ -25,6 +25,10 @@ public class CreateDatabase {
 	private final String DATABASE_FILENAME = "dictionary.db";
 	String databaseFilename = DATABASE_PATH + "/" + DATABASE_FILENAME;
 
+		/**
+		 * @return
+		 * 在手机上创建数据库文件，并将之返回
+		 */
 		public  SQLiteDatabase createDatabase() {
 		File file = new File(DATABASE_PATH);
 		if(!file.exists()){file.mkdir();}

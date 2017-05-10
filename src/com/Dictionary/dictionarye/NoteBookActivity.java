@@ -3,11 +3,11 @@ package com.Dictionary.dictionarye;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -40,9 +40,11 @@ public class NoteBookActivity extends Activity implements OnClickListener {
 	private SQLiteDatabase database;
 	private String [] edata;
 	private Map<String, String> data;
+	private Bundle savedInstanceState;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.savedInstanceState = savedInstanceState;
 		setContentView(R.layout.activity_note_book);
 		word_type=(Spinner) findViewById(R.id.word_type);
 		words_show= (ListView) findViewById(R.id.words_show);
@@ -55,32 +57,47 @@ public class NoteBookActivity extends Activity implements OnClickListener {
 		words_show.setAdapter(new MyListviewAdapter(this,Words.getCursor(),true));
 		Homepage.setOnClickListener(this);
 		practice.setOnClickListener(this);
-		words_show.setOnItemClickListener(new OnItemClickListener() {
+
+		words_show.setOnItemClickListener(/**
+		 * @author minqi
+		 *当点击单词时进行的操作
+		 */
+		new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				// TODO Auto-generated method stub
 				String key = edata[position];
 				new AlertDialog.Builder(NoteBookActivity.this).setTitle(key)
-				.setMessage(data.get(key)).setPositiveButton("ȷ��", null).show();
+				.setMessage(data.get(key)).setPositiveButton("确定", null).show();
 			}
 		});
 		words_show.setOnItemLongClickListener(new OnItemLongClickListener() {
 
+			/* (non-Javadoc)
+			 * @see android.widget.AdapterView.OnItemLongClickListener#onItemLongClick(android.widget.AdapterView, android.view.View, int, long)
+			 * 生词本单词被长按时执行的操作
+			 */
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 				// TODO Auto-generated method stub
-				String key = edata[position];
-				ContentValues values = new ContentValues();
+				final String key = edata[position];
+				final ContentValues values = new ContentValues();
 				try {
 						values.put("collected",0);
-						database.update("t_words", values, "english=?", new String[]{key});
-
-						Intent in = new Intent(); 
-				        in.setClassName( NoteBookActivity.this, "com.Dictionary.dictionarye.NoteBookActivity");  
-				        startActivityForResult(in, 0);
-				        Toast.makeText(NoteBookActivity.this, "�ѽ�"+key+"�Ƴ����ʱ�", 1).show();
-				        return true;
+						new AlertDialog.Builder(NoteBookActivity.this)
+						.setMessage("确定删除？")
+						.setPositiveButton("删除",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface di, int i) {
+										database.update("t_words", values, "english=?", new String[]{key});
+						            	NoteBookActivity.this.onCreate(NoteBookActivity.this.savedInstanceState);
+						            	Toast.makeText(NoteBookActivity.this, "单词"+key+"已移生词本", 1).show();
+						            	
+										//由于只生成了一个view组件 所以刷新没用
+									};
+								}).setNegativeButton("取消", null).show();
+						return true;
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -89,8 +106,11 @@ public class NoteBookActivity extends Activity implements OnClickListener {
 			}
 		});
 	}
-
-	@Override
+ 
+	/* (non-Javadoc)
+	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+	 * 当界面上的button被点击后进行相关操作
+	 */
 	public void onClick(View arg0) {
 		// TODO Auto-generated method stub
 		switch (arg0.getId()) {
@@ -106,6 +126,11 @@ public class NoteBookActivity extends Activity implements OnClickListener {
 		}
 		
 	}
+	/**
+	 * @param context
+	 * @param page
+	 * 跳转界面
+	 */
 	private void changePage(Context context,String page){
 		Intent in = new Intent();  
         in.setClassName( context, page);  

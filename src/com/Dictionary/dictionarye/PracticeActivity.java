@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -48,6 +49,7 @@ public class PracticeActivity extends Activity implements OnClickListener{
 	private int error_count;
 	private String show_word;
 	private Thread newThread; 
+	private Bundle savedInstanceState;
 	private Handler myHandler=new Handler(){
 		public void handleMessage(android.os.Message msg) {
 			String[] content = (String[]) msg.obj;
@@ -82,12 +84,17 @@ public class PracticeActivity extends Activity implements OnClickListener{
 		setContentView(R.layout.activity_practice);
 		init();
 		if(wordcount <= 0){
+		//	onCreate(this.savedInstanceState);
+			btn_a.setVisibility(4);
+			btn_b.setVisibility(4);
+			btn_c.setVisibility(4);
+			//group.setVisibility(0);
 			new AlertDialog.Builder(PracticeActivity.this)
-			.setMessage("Error:ÄúµÄÉú´Ê±¾ÊÇ¿ÕµÄ£¡").setPositiveButton("È·ÈÏ", null).show();
-			Intent in = new Intent(); 
+			.setMessage("Error:æ‚¨çš„ç”Ÿè¯æœ¬ä¸ºç©º").setPositiveButton("ç¡®å®š", null).show();
+		/*	Intent in = new Intent(); 
 	        in.setClassName( PracticeActivity.this, "com.Dictionary.dictionarye.MainActivity");  
-	        startActivity(in);
-		}
+	        startActivity(in);*/
+		}else{
 		tested_word = new String[wordcount];
 		errorlog = new StringBuilder();
 		showTopic();
@@ -121,9 +128,13 @@ public class PracticeActivity extends Activity implements OnClickListener{
 			showTopic();
 			}
 		});
+		}
 		end_practice.setOnClickListener(this);
 		practice_homepage.setOnClickListener(this);		
 	}
+	/**
+	 * å¯¹ç»„ä»¶ï¼Œæ•°æ®åº“ï¼Œå’Œç›¸å…³å˜é‡è¿›è¡Œåˆå§‹åŒ–
+	 */
 	private void init() {
 		group= (RadioGroup) findViewById(R.id.radioGroup1);
 		btn_a = (RadioButton) findViewById(R.id.btn_a);
@@ -143,13 +154,16 @@ public class PracticeActivity extends Activity implements OnClickListener{
 		edata = Words.getEdata();
 		wordcount =Words.getWordcount();
 	}
+	/**
+	 * æ˜¾ç¤ºé¢˜ç›®å’Œé€‰é¡¹å†…å®¹
+	 */
 	private void showTopic(){
 		btn_a.setChecked(false);
 		btn_b.setChecked(false);
 		btn_c.setChecked(false);
 		if (practice_count>=wordcount) {
 			new AlertDialog.Builder(PracticeActivity.this)
-			.setMessage("Éú´ÊÒÑÁ·Ï°Íê").setPositiveButton("È·ÈÏ", null).show();
+			.setMessage("æ‚¨çš„ç”Ÿè¯å·²ç»ƒå®Œ").setPositiveButton("ç¡®å®š", null).show();
 			end_practice.callOnClick();
 		}
 		practice_count++;
@@ -197,14 +211,14 @@ public class PracticeActivity extends Activity implements OnClickListener{
 		switch (v.getId()) {
 		case R.id.end_practice:
 			StringBuilder grade=new StringBuilder();
-			grade.append("ÌâÄ¿×ÜÊı£º"+(practice_count-1)+"\tÕıÈ·¸öÊı£º"+(practice_count-1-error_count)+"\nÄú´íÎóµÄµ¥´ÊÎª£º\n");
+			grade.append("æ€»é¢˜æ•°ï¼š"+(practice_count-1)+"\nåšå¯¹ï¼š"+(practice_count-1-error_count)+"\né”™è¯¯çš„é¢˜ç›®ä¸º:\n");
 			grade.append(errorlog);
 			//group.setClickable(false);
 			btn_a.setClickable(false);
 			btn_b.setClickable(false);
 			btn_c.setClickable(false);
-			new AlertDialog.Builder(PracticeActivity.this).setTitle("ÄúµÄÁ·Ï°³É¼¨Îª£º")
-			.setMessage(grade).setPositiveButton("È·ÈÏ", null).show();
+			new AlertDialog.Builder(PracticeActivity.this).setTitle("æ‚¨çš„æˆç»©ä¸º:")
+			.setMessage(grade).setPositiveButton("ç¡®å®š", null).show();
 			break;
 		case R.id.practice_homepage:
 			Intent in = new Intent(); 

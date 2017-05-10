@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">卓越词典</string>
+    <string name="app_name">查词</string>
     <string name="actv_hint">Input a word please</string>
     <string name="search_button">search</string>
     <string name="btn_login"> Login </string>

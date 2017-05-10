@@ -77,6 +77,11 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
 		// TODO Auto-generated method stub
 		//result_show.setText("");
 	}
+	
+	/* (non-Javadoc)
+	 * @see android.text.TextWatcher#afterTextChanged(android.text.Editable)
+	 * 输入框内容改变之后执行的操作
+	 */
 	@Override
 	public void afterTextChanged(Editable s) {
 		// TODO Auto-generated method stub
