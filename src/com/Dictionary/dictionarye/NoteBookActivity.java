@@ -117,11 +117,13 @@ public class NoteBookActivity extends Activity implements OnClickListener {
 		case R.id.btn_homepage:
 			String page = "com.Dictionary.dictionarye.MainActivity";
 			changePage(NoteBookActivity.this, page);
+			NoteBookActivity.this.finish();
 			break;
 
 		case R.id.btn_prectise:
 			String page1 = "com.Dictionary.dictionarye.PracticeActivity";
 			changePage(NoteBookActivity.this, page1);
+			NoteBookActivity.this.finish();
 			break;
 		}
 		
@@ -168,5 +170,34 @@ public class NoteBookActivity extends Activity implements OnClickListener {
 		}
 		
 	}
+	@Override  
+	public void onBackPressed() {  
+	  
+	       Toast.makeText(this, "继续点击一次返回键将返回查询界面", Toast.LENGTH_LONG).show();  
+	    new AlertDialog.Builder(this).setTitle("确认返回吗？")  
+	    .setPositiveButton("确定", new DialogInterface.OnClickListener() {  
+	          
+	        @Override  
+	        public void onClick(DialogInterface dialog, int which) {  
+	              
+	            //退出APP  
+	        	String page = "com.Dictionary.dictionarye.MainActivity";
+				changePage(NoteBookActivity.this, page);
+	            NoteBookActivity.this.finish();  
+	            //异常导致app挂掉,需要发送完数据后，kill掉死掉的APP。  
+	            //int myPid=android.os.Process.myPid();  
+	            //android.os.Process.killProcess(myPid);  
+	        }  
+	    })  
+	    .setNegativeButton("取消", new DialogInterface.OnClickListener() {  
+	          
+	        @Override  
+	        public void onClick(DialogInterface dialog, int which) {  
+	        	
+	            //nothing to do   
+	        }  
+	    })  
+	    .show();  
+	}  
 	
 }

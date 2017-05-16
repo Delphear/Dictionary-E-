@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources.NotFoundException;
 import android.database.Cursor;
@@ -152,7 +153,7 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
 			}
 			break;
 		case R.id.homepage:
-			String page = "com.Dictionary.dictionarye.MainActivity";
+			String page = "com.Dictionary.dictionarye.RepeatActivity";
 			changePage(MainActivity.this, page);
 			break;
 		case R.id.btn_notebook:
@@ -171,6 +172,7 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
 		Intent in = new Intent(); 
         in.setClassName( context, page);  
         startActivity(in);
+		MainActivity.this.finish();
 	}
 	
 	public static SQLiteDatabase getDatabase() {
@@ -209,5 +211,32 @@ public class MainActivity extends Activity implements OnClickListener, TextWatch
 			// TODO Auto-generated method stub
 			setView(view, cursor);
 		}
-	}	
+	}
+	@Override  
+	public void onBackPressed() {  
+	  
+	       Toast.makeText(this, "继续点击一次返回键将退出", Toast.LENGTH_LONG).show();  
+	    new AlertDialog.Builder(this).setTitle("确认退出吗？")  
+	    .setPositiveButton("确定", new DialogInterface.OnClickListener() {  
+	          
+	        @Override  
+	        public void onClick(DialogInterface dialog, int which) {  
+	              
+	            //退出APP  
+	            MainActivity.this.finish();  
+	            //异常导致app挂掉,需要发送完数据后，kill掉死掉的APP。  
+	            //int myPid=android.os.Process.myPid();  
+	            //android.os.Process.killProcess(myPid);  
+	        }  
+	    })  
+	    .setNegativeButton("返回", new DialogInterface.OnClickListener() {  
+	          
+	        @Override  
+	        public void onClick(DialogInterface dialog, int which) {  
+	              
+	            //nothing to do   
+	        }  
+	    })  
+	    .show();  
+	}  
 }

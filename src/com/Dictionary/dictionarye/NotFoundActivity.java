@@ -21,5 +21,6 @@ public class NotFoundActivity extends Activity {
 		Intent in = new Intent();  
         in.setClassName( NotFoundActivity.this, "com.Dictionary.dictionarye.MainActivity");  
         startActivityForResult(in, 0);
+        NotFoundActivity.this.finish();
 	}
 }

@@ -82,7 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:background="@drawable/dict_normal"
+            android:background="@drawable/dict_repeat"
             />
 
     </RelativeLayout>

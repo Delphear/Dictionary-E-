@@ -13,5 +13,6 @@
     <string name="title_activity_note_book">生词本</string>
     <string name="title_activity_practice">生词练习</string>
     <string name="title_activity_not_found"></string>
+    <string name="title_activity_repeat">背单词</string>
 
 </resources>

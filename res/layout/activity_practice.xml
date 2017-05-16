@@ -5,23 +5,6 @@
     android:background="@drawable/bg"
     tools:context="${relativePackage}.${activityClass}" >
 
-    <TextView
-        android:id="@+id/topic"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="160dp"
-        android:text=""
-        android:textSize="30sp" />
-
-    <Button
-        android:id="@+id/end_practice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:background="@drawable/stop" />
-
     <Button
         android:id="@+id/practice_homepage"
         android:layout_width="wrap_content"
@@ -96,5 +79,42 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/end_practice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/show_answer"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/stop" />
+
+    <TextView
+        android:id="@+id/topic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="76dp"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/show_answer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/practice_homepage"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="26dp"
+        android:textColor="#ff0040"
+        android:textSize="25sp" />
+
+    <Button
+        android:id="@+id/next_topic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible"
+        android:text="next" />
 
 </RelativeLayout>

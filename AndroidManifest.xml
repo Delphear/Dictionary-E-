@@ -38,6 +38,10 @@
             android:name=".NotFoundActivity"
             android:label="@string/title_activity_not_found" >
         </activity>
+        <activity
+            android:name=".RepeatActivity"
+            android:label="@string/title_activity_repeat" >
+        </activity>
     </application>
 
 </manifest>

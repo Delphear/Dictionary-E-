@@ -1,5 +1,6 @@
 package com.Dictionary.dictionarye;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -7,6 +8,7 @@ import java.util.Random;
 import android.R.integer;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseErrorHandler;
@@ -26,6 +28,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class PracticeActivity extends Activity implements OnClickListener{
 	private static final String ACTIVITY_TAG="LogDemoPractice";
@@ -37,6 +40,8 @@ public class PracticeActivity extends Activity implements OnClickListener{
 	private TextView text_b;
 	private TextView text_c;
 	private TextView topic;
+	private TextView show_answer;
+	private Button next_topic;
 	private Button end_practice;
 	private Button practice_homepage;
 	private SQLiteDatabase database;
@@ -47,6 +52,7 @@ public class PracticeActivity extends Activity implements OnClickListener{
 	private StringBuilder errorlog;
 	private int practice_count;
 	private int error_count;
+	private int right_count;
 	private String show_word;
 	private Thread newThread; 
 	private Bundle savedInstanceState;
@@ -109,28 +115,47 @@ public class PracticeActivity extends Activity implements OnClickListener{
 				case R.id.btn_a:
 					if(!text_a.getText().equals(text)){
 						error_count++;
-						errorlog.append(show_word+"\n"+text+"\n");
+						show_answer.setText(text);
+						next_topic.setVisibility(0);
+						Log.e(ACTIVITY_TAG, text+"******"+error_count);
+						//errorlog.append(show_word+"\n"+text+"\n");
+					}else{
+						right_count++;
+					next_topic.callOnClick();
 					}
 					break;
 				case R.id.btn_b:
 					if(!text_b.getText().equals(text)){
 						error_count++;
+						show_answer.setText(text);
+						next_topic.setVisibility(0);
+						Log.e(ACTIVITY_TAG, text+"******"+error_count);
 						errorlog.append(show_word+"\n"+text+"\n");
-					}
+					}else{
+						right_count++;
+						next_topic.callOnClick();
+						}
 					break;
 				case R.id.btn_c:
 					if(!text_c.getText().equals(text)){
 						error_count++;
+						show_answer.setText(text);
+						next_topic.setVisibility(0);
+						Log.e(ACTIVITY_TAG, text+"******"+error_count);
 						errorlog.append(show_word+"\n"+text+"\n");
-					}
+					}else{
+						right_count++;
+						next_topic.callOnClick();
+						}
 					break;
-				}
-			showTopic();
+
+				}							
 			}
 		});
 		}
 		end_practice.setOnClickListener(this);
-		practice_homepage.setOnClickListener(this);		
+		practice_homepage.setOnClickListener(this);	
+		next_topic.setOnClickListener(this);
 	}
 	/**
 	 * 对组件，数据库，和相关变量进行初始化
@@ -144,10 +169,13 @@ public class PracticeActivity extends Activity implements OnClickListener{
 		text_b = (TextView) findViewById(R.id.text_b);
 		text_c = (TextView) findViewById(R.id.text_c);
 		topic =(TextView) findViewById(R.id.topic);
+		show_answer = (TextView) findViewById(R.id.show_answer);
+		next_topic = (Button) findViewById(R.id.next_topic);
 		end_practice = (Button) findViewById(R.id.end_practice);
 		practice_homepage = (Button) findViewById(R.id.practice_homepage);
 		practice_count = 0;
 		error_count = 0;
+		right_count=0;
 		Words.setWords();
 		database = Words.getDatabase();
 		data = Words.getData();
@@ -211,8 +239,18 @@ public class PracticeActivity extends Activity implements OnClickListener{
 		switch (v.getId()) {
 		case R.id.end_practice:
 			StringBuilder grade=new StringBuilder();
-			grade.append("总题数："+(practice_count-1)+"\n做对："+(practice_count-1-error_count)+"\n错误的题目为:\n");
-			grade.append(errorlog);
+			int total = practice_count-1;
+			DecimalFormat format2 = new DecimalFormat( "0.00 "); 
+			double weight=(right_count*1.0/total)*100;
+			weight = Double.parseDouble(format2.format(weight));
+			//double weight =right_count/total; 
+			try {
+				grade.append("总题数："+(total)+"\n做对："+(right_count)+"\n正确率："+weight+"%");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//grade.append(errorlog);
 			//group.setClickable(false);
 			btn_a.setClickable(false);
 			btn_b.setClickable(false);
@@ -224,8 +262,45 @@ public class PracticeActivity extends Activity implements OnClickListener{
 			Intent in = new Intent(); 
 	        in.setClassName( PracticeActivity.this, "com.Dictionary.dictionarye.MainActivity");  
 	        startActivity(in);
+	        PracticeActivity.this.finish();
 	        break;
+		case R.id.next_topic:
+			showTopic();
+			show_answer.setText("");
+			next_topic.setVisibility(4);
+			break;
 		}
 		
-	}	
+	}
+	@Override  
+	public void onBackPressed() {  
+	  
+	       Toast.makeText(this, "继续点击一次返回键将返回查询界面", Toast.LENGTH_LONG).show();  
+	    new AlertDialog.Builder(this).setTitle("确认返回吗？")  
+	    .setPositiveButton("确定", new DialogInterface.OnClickListener() {  
+	          
+	        @Override  
+	        public void onClick(DialogInterface dialog, int which) {  
+	              
+	            //退出APP  
+	        	String page = "com.Dictionary.dictionarye.MainActivity";
+	        	Intent in = new Intent(); 
+	            in.setClassName( PracticeActivity.this, page);  
+	            startActivity(in);
+	            PracticeActivity.this.finish();  
+	            //异常导致app挂掉,需要发送完数据后，kill掉死掉的APP。  
+	            //int myPid=android.os.Process.myPid();  
+	            //android.os.Process.killProcess(myPid);  
+	        }  
+	    })  
+	    .setNegativeButton("取消", new DialogInterface.OnClickListener() {  
+	          
+	        @Override  
+	        public void onClick(DialogInterface dialog, int which) {  
+	        	
+	            //nothing to do   
+	        }  
+	    })  
+	    .show();  
+	}  
 }
